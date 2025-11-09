@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "VirtualIPSwitcherMaui": {
+      "commandName": "MsixPackage",
+      "nativeDebugging": false
+    }
+  }
+}
