@@ -1,0 +1,46 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Install MAUI workload
+      run: dotnet workload install maui
+
+    - name: List files
+      run: dir
+
+    - name: List VirtualIPSwitcherRepo files
+      run: dir VirtualIPSwitcherRepo
+
+    - name: List VirtualIPSwitcherMaui files
+      run: dir VirtualIPSwitcherRepo/VirtualIPSwitcherMaui
+
+    - name: Show Global.json content
+      run: type VirtualIPSwitcherRepo\VirtualIPSwitcherMaui\Global.json
+
+    - name: Restore dependencies
+      run: dotnet restore VirtualIPSwitcherRepo/VirtualIPSwitcherMaui/VirtualIPSwitcherMaui.csproj
+
+    - name: Build APK
+      run: dotnet publish VirtualIPSwitcherRepo/VirtualIPSwitcherMaui/VirtualIPSwitcherMaui.csproj -f net8.0-android34.0 -c Release -p:AndroidSigningKeyStore=keystore.file -p:AndroidSigningKeyAlias=alias -p:AndroidSigningKeyPass=password -p:AndroidSigningStorePass=password
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: apk
+        path: VirtualIPSwitcherRepo/VirtualIPSwitcherMaui/bin/Release/net8.0-android34.0/*.apk
